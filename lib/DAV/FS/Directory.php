@@ -40,11 +40,12 @@ class Directory extends Node implements DAV\ICollection, DAV\IQuota
      *
      * @return string|null
      */
-    public function createFile($name, $data = null)
+    public function createFile(string $name, $data = null): ?string
     {
         $newPath = $this->path.'/'.$name;
         file_put_contents($newPath, $data);
         clearstatcache(true, $newPath);
+	return null;
     }
 
     /**
@@ -52,7 +53,7 @@ class Directory extends Node implements DAV\ICollection, DAV\IQuota
      *
      * @param string $name
      */
-    public function createDirectory($name)
+    public function createDirectory(string $name): void
     {
         $newPath = $this->path.'/'.$name;
         mkdir($newPath);
@@ -65,13 +66,9 @@ class Directory extends Node implements DAV\ICollection, DAV\IQuota
      * This method must throw DAV\Exception\NotFound if the node does not
      * exist.
      *
-     * @param string $name
-     *
-     * @return DAV\INode
-     *
      * @throws DAV\Exception\NotFound
      */
-    public function getChild($name)
+    public function getChild(string $name): DAV\INode
     {
         $path = $this->path.'/'.$name;
 
@@ -90,7 +87,7 @@ class Directory extends Node implements DAV\ICollection, DAV\IQuota
      *
      * @return DAV\INode[]
      */
-    public function getChildren()
+    public function getChildren(): array
     {
         $nodes = [];
         $iterator = new \FilesystemIterator(
@@ -107,12 +104,8 @@ class Directory extends Node implements DAV\ICollection, DAV\IQuota
 
     /**
      * Checks if a child exists.
-     *
-     * @param string $name
-     *
-     * @return bool
      */
-    public function childExists($name)
+    public function childExists(string $name): bool
     {
         $path = $this->path.'/'.$name;
 
@@ -122,7 +115,7 @@ class Directory extends Node implements DAV\ICollection, DAV\IQuota
     /**
      * Deletes all files in this directory, and then itself.
      */
-    public function delete()
+    public function delete(): void
     {
         foreach ($this->getChildren() as $child) {
             $child->delete();

@@ -39,7 +39,7 @@ class File extends Node implements DAV\IFile
     /**
      * Delete the current file.
      */
-    public function delete()
+    public function delete(): void
     {
         unlink($this->path);
     }
@@ -49,7 +49,7 @@ class File extends Node implements DAV\IFile
      *
      * @return int
      */
-    public function getSize()
+    public function getSize(): int
     {
         return filesize($this->path);
     }
@@ -62,7 +62,7 @@ class File extends Node implements DAV\IFile
      *
      * Return null if the ETag can not effectively be determined
      */
-    public function getETag()
+    public function getETag(): string
     {
         return '"'.sha1(
             fileinode($this->path).
@@ -76,7 +76,7 @@ class File extends Node implements DAV\IFile
      *
      * If null is returned, we'll assume application/octet-stream
      */
-    public function getContentType()
+    public function getContentType(): ?string
     {
         return null;
     }
