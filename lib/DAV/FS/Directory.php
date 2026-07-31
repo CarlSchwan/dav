@@ -37,24 +37,33 @@ class Directory extends Node implements DAV\ICollection, DAV\IQuota
      *
      * @param string          $name Name of the file
      * @param resource|string $data Initial payload
-     *
-     * @return string|null
      */
     public function createFile(string $name, $data = null): ?string
     {
+        // We're not allowing dots
+        if ('.' == $name || '..' == $name) {
+            throw new DAV\Exception\Forbidden('Permission denied to . and ..');
+        }
         $newPath = $this->path.'/'.$name;
         file_put_contents($newPath, $data);
         clearstatcache(true, $newPath);
-	return null;
+
+        return '"'.sha1(
+            fileinode($newPath).
+            filesize($newPath).
+            filemtime($newPath)
+        ).'"';
     }
 
     /**
      * Creates a new subdirectory.
-     *
-     * @param string $name
      */
     public function createDirectory(string $name): void
     {
+        // We're not allowing dots
+        if ('.' == $name || '..' == $name) {
+            throw new DAV\Exception\Forbidden('Permission denied to . and ..');
+        }
         $newPath = $this->path.'/'.$name;
         mkdir($newPath);
         clearstatcache(true, $newPath);
@@ -74,6 +83,9 @@ class Directory extends Node implements DAV\ICollection, DAV\IQuota
 
         if (!file_exists($path)) {
             throw new DAV\Exception\NotFound('File with name '.$path.' could not be located');
+        }
+        if ('.' == $name || '..' == $name) {
+            throw new DAV\Exception\Forbidden('Permission denied to . and ..');
         }
         if (is_dir($path)) {
             return new self($path);
@@ -107,6 +119,10 @@ class Directory extends Node implements DAV\ICollection, DAV\IQuota
      */
     public function childExists(string $name): bool
     {
+        if ('.' == $name || '..' == $name) {
+            throw new DAV\Exception\Forbidden('Permission denied to . and ..');
+        }
+
         $path = $this->path.'/'.$name;
 
         return file_exists($path);
