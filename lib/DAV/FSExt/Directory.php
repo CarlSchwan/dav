@@ -157,13 +157,13 @@ class Directory extends Node implements DAV\ICollection, DAV\IQuota, DAV\IMoveTa
 
     /**
      * Returns available diskspace information.
-     *
-     * @return array
      */
-    public function getQuotaInfo()
+    public function getQuotaInfo(): array
     {
-        $total = disk_total_space(realpath($this->path));
-        $free = disk_free_space(realpath($this->path));
+        $absolute = realpath($this->path);
+
+        $total = disk_total_space($absolute);
+        $free = disk_free_space($absolute);
 
         return [
             $total - $free,
